@@ -12,16 +12,17 @@
       (replace #"_" "-")
       (replace #"/" ".")))
 
-(defn var-type
-  [v]
+(defn var->type [v]
   {:pre [(var? v)]}
   (let [m (meta v)]
-    (cond (:macro m)   "macro"
-          (:dynamic m) "var"
-          (fn? @v)     "fn"
-          :else        "var")))
+    (cond (:macro m)   :macro
+          (:dynamic m) :var
+          (fn? @v)     :fn
+          :else        :var)))
 
-(defn var->thing [{:keys [groupid artifactid version]} var]
+(defn var->thing
+
+  [{:keys [groupid artifactid version]} var]
   ;; FIXME: get the ns, name out of the var & make a :def thing
   )
 
@@ -47,20 +48,21 @@
             (read (PushbackReader. pbr)))
           (str text))))))
 
-(defn write-docs-for-var [config var]
+(defn write-docs-for-var
+
+  [config var]
   (let [docs (-> (meta var)
-                 (assoc  :src (var->src var))
+                 (assoc  :src  (var->src var)
+                         :type (var->type var))
                  (update :name name)
-                 (update :ns   ns->name))
-        type (cond (:macro? docs) :macro
-                   (fn? @var)     :fn
-                   true           :var)
-        docs (assoc docs :type type)]
+                 (update :ns   ns->name))]
     (api/write-meta config
                     (var->thing config var)
                     docs)))
 
-(defn write-docs-for-specials [config]
+(defn write-docs-for-specials
+
+  [config]
   (doseq [[sym fake-meta] @#'clojure.repl/special-doc-map]
     ;; FIXME
     ))
@@ -85,7 +87,9 @@
   (println "Finished" ns)
   nil)
 
-(defn -main [groupid artifactid version & args]
+(defn -main
+
+  [groupid artifactid version & args]
   (doseq [ns (tns.f/find-namespaces
               (clojure.java.classpath/classpath))]
     (require ns)

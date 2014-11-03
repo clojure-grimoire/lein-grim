@@ -21,9 +21,44 @@
           (fn? @v)     "fn"
           :else        "var")))
 
-(defn write-docs-for-var [config var]
-  ;; FIXME
+(defn var->thing [{:keys [groupid artifactid version]} var]
+  ;; FIXME: get the ns, name out of the var & make a :def thing
   )
+
+(defn var->src
+  "Adapted from clojure.repl/source-fn. Returns a string of the source code for
+  the given var, if it can find it. Returns nil if it can't find the source.
+
+  Example: (var->src #'clojure.core/filter)"
+  
+  [v]
+  {:pre [(var? v)]}
+  (when-let [filepath (:file (meta v))]
+    (when-let [strm (.getResourceAsStream (RT/baseLoader) filepath)]
+      (with-open [rdr (LineNumberReader. (InputStreamReader. strm))]
+        (dotimes [_ (dec (:line (meta v)))] (.readLine rdr))
+        (let [text (StringBuilder.)
+              pbr (proxy [PushbackReader] [rdr]
+                    (read [] (let [i (proxy-super read)]
+                               (.append text (char i))
+                               i)))]
+          (if (= :unknown *read-eval*)
+            (throw (IllegalStateException. "Unable to read source while *read-eval* is :unknown."))
+            (read (PushbackReader. pbr)))
+          (str text))))))
+
+(defn write-docs-for-var [config var]
+  (let [docs (-> (meta var)
+                 (assoc  :src (var->src var))
+                 (update :name name)
+                 (update :ns   ns->name))
+        type (cond (:macro? docs) :macro
+                   (fn? @var)     :fn
+                   true           :var)
+        docs (assoc docs :type type)]
+    (api/write-meta config
+                    (var->thing config var)
+                    docs)))
 
 (defn write-docs-for-specials [config]
   (doseq [[sym fake-meta] @#'clojure.repl/special-doc-map]
@@ -42,15 +77,16 @@
 
     ;; write per symbol docs
     (doseq [var ns-vars]
-      (write-docs-for-var ns-dir var))
+      (write-docs-for-var config var))
 
     (when (= ns 'clojure.core)
-      (write-docs-for-specials ns-dir)))
+      (write-docs-for-specials config)))
 
   (println "Finished" ns)
   nil)
 
 (defn -main [groupid artifactid version & args]
-  (doseq [ns (tns.f/find-namespaces (clojure.java.classpath/classpath))]
+  (doseq [ns (tns.f/find-namespaces
+              (clojure.java.classpath/classpath))]
     (require ns)
     (write-docs-for-ns config ns)))

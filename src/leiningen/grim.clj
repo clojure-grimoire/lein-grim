@@ -4,8 +4,8 @@
 (def deps
   ['[org.clojure/tools.namespace "0.2.7"]
    '[org.clojure/java.classpath "0.2.2"]
-   '[org.clojure-grimoire/lib-grimoire "0.1.0"]
-   '[org.clojure-grimoire/lein-grim "0.1.0"] ;; FIXME: do this better?
+   '[org.clojure-grimoire/lib-grimoire "0.1.1"]
+   '[org.clojure-grimoire/lein-grim "0.1.1"] ;; FIXME: do this better?
    '[me.arrdem/detritus "0.2.0"]])
 
 (defn grim

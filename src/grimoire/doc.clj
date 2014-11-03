@@ -15,10 +15,11 @@
 (defn var->type [v]
   {:pre [(var? v)]}
   (let [m (meta v)]
-    (cond (:macro m)   :macro
-          (:dynamic m) :var
-          (fn? @v)     :fn
-          :else        :var)))
+    (cond (:macro m)               :macro
+          (or (:dynamic m)
+              (.isDynamic ^Var v)) :var
+          (fn? @v)                 :fn
+          :else                    :var)))
 
 (defn var->thing
 

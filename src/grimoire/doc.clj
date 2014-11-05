@@ -55,6 +55,18 @@
             (read (java.io.PushbackReader. pbr)))
           (str text))))))
 
+(defn ns-stringifier [x]
+  (cond (instance? clojure.lang.Namespace x)
+        ,,(ns-name x)
+
+        (string? x)
+        ,,x
+
+        :else
+        ,,(throw
+           (Exception.
+            (str "Don't know how to stringify " x)))))
+
 (defn write-docs-for-var
 
   [config var]
@@ -62,7 +74,7 @@
                  (assoc  :src  (var->src var)
                          :type (var->type var))
                  (update :name name)
-                 (update :ns   ns-name))]
+                 (update :ns   ns-stringifier))]
     (api/write-meta config
                     (var->thing config var)
                     docs)))

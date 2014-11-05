@@ -1,5 +1,4 @@
 (ns grimoire.doc
-  (:refer-clojure :exclude [munge])
   (:require [clojure.java.io :as io]
             [clojure.string :as string]
             [clojure.repl] ;; gon crowbar into this...

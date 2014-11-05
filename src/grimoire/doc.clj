@@ -58,17 +58,19 @@
   (when-let [filepath (:file (meta v))]
     (when-let [strm (.getResourceAsStream (clojure.lang.RT/baseLoader) filepath)]
       (with-open [rdr (java.io.LineNumberReader. (java.io.InputStreamReader. strm))]
-        (dotimes [_ (dec (:line (meta v)))] (.readLine rdr))
+        (dotimes [_ (dec (:line (meta v)))]
+          (.readLine rdr))
         (let [text (StringBuilder.)
-              pbr (proxy [java.io.PushbackReader] [rdr]
-                    (read [] (let [i (proxy-super read)]
-                               (.append text (char i))
-                               i)))]
+              pbr  (proxy [java.io.PushbackReader] [rdr]
+                     (read [] (let [i (proxy-super read)]
+                                (.append text (char i))
+                                i)))]
           (if (= :unknown *read-eval*)
             (throw
              (IllegalStateException.
               "Unable to read source while *read-eval* is :unknown."))
-            (read (java.io.PushbackReader. pbr)))
+            (binding [*ns* (the-ns (var->ns v))]
+              (read (java.io.PushbackReader. pbr))))
           (str text))))))
 
 (defn ns-stringifier

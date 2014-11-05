@@ -86,7 +86,7 @@
     (api/write-meta config
                     (t/->Def groupid artifactid version "clojure.core" (name sym))
                     {:ns       "clojure.core"
-                     :name     (name sym)
+                     :name     sym
                      :doc      doc
                      :arglists forms
                      :src      ";; Special forms have no source"

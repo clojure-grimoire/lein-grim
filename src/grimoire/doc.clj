@@ -12,7 +12,9 @@
             [detritus.var :refer [var->ns var->sym macro?]]
             [detritus.update :refer [update]]))
 
-(defn var->type [v]
+(defn var->type
+
+  [v]
   {:pre [(var? v)]}
   (let [m (meta v)]
     (cond (:macro m)                            :macro
@@ -24,19 +26,34 @@
 (defn var->thing
 
   [{:keys [groupid artifactid version]} var]
-  ;; FIXME: get the ns, name out of the var & make a :def thing
+  {:pre [(string? groupid)
+         (string? artifactid)
+         (string? version)
+         (var? var)]}
   (t/->Def groupid
            artifactid
            version
            (name (var->ns var))
            (name (var->sym var))))
 
+(defn ns->thing
+
+  [{:keys [groupid artifactid version]} ns-symbol]
+  {:pre [(symbol? ns-symbol)
+         (string? groupid)
+         (string? artifactid)
+         (string? version)]}
+  (t/->Ns groupid
+          artifactid
+          version
+          (name ns-symbol)))
+
 (defn var->src
   "Adapted from clojure.repl/source-fn. Returns a string of the source code for
   the given var, if it can find it. Returns nil if it can't find the source.
 
   Example: (var->src #'clojure.core/filter)"
-  
+
   [v]
   {:pre [(var? v)]}
   (when-let [filepath (:file (meta v))]
@@ -55,13 +72,27 @@
             (read (java.io.PushbackReader. pbr)))
           (str text))))))
 
-(defn ns-stringifier [x]
-  (cond (instance? clojure.lang.Namespace x)
-        ,,(ns-name x)
+(defn ns-stringifier
 
+  [x]
+  (cond (instance? clojure.lang.Namespace x)
+        ,,(name (ns-name x))
         (string? x)
         ,,x
+        (symbol? x)
+        ,,(name x)
+        :else
+        ,,(throw
+           (Exception.
+            (str "Don't know how to stringify " x)))))
 
+(defn name-stringifier
+
+  [x]
+  (cond (symbol? x)
+        ,,(name x)
+        (string? x)
+        ,,x
         :else
         ,,(throw
            (Exception.
@@ -73,7 +104,7 @@
   (let [docs (-> (meta var)
                  (assoc  :src  (var->src var)
                          :type (var->type var))
-                 (update :name name)
+                 (update :name name-stringifier)
                  (update :ns   ns-stringifier))]
     (api/write-meta config
                     (var->thing config var)
@@ -100,6 +131,7 @@
   #{#'clojure.data/Diff})
 
 (defn write-docs-for-ns
+
   [config ns]
   (let [ns-vars (->> (ns-publics ns) vals (remove var-blacklist))
         macros  (filter macro? ns-vars)
@@ -107,6 +139,10 @@
                               (not (macro? %1)))
                         ns-vars)
         vars    (filter #(not (fn? @%1)) ns-vars)]
+
+    (let [meta  (-> ns the-ns meta)
+          thing (ns->thing config ns)]
+      (api/write-meta config thing meta))
 
     ;; write per symbol docs
     (doseq [var ns-vars]
@@ -121,14 +157,26 @@
 
 (defn -main
 
-  [groupid artifactid version pattern target]
-  (let [pattern (re-pattern pattern)
-        config  {:groupid    groupid
+  [groupid artifactid version target files-thing]
+  (let [config  {:groupid    groupid
                  :artifactid artifactid
                  :version    version
                  :datastore  {:docs target}}]
-    (doseq [ns (tns.f/find-namespaces
-                (cp/classpath))]
-      (when (re-matches pattern (name ns))
+    (if (= :classpath files-thing)
+      ;; classpath searching case
+      (let [pattern (format ".*?/%s/%s/%s.*"
+                            (string/replace groupid "." "/") artifactid version)
+            pattern (re-pattern pattern)]
+        (doseq [e (cp/classpath)]
+          (when (re-matches pattern (str e))
+            (doseq [ns (tns.f/find-namespaces [e])]
+              (when-not (= ns 'clojure.parallel) ;; FIXME: get out nobody likes you
+                (require ns)
+                (write-docs-for-ns config ns))))))
+
+      ;; source dirs vector case
+      (doseq [ns (->> files-thing
+                      (map io/file)
+                      (tns.f/find-namespaces))]
         (require ns)
         (write-docs-for-ns config ns)))))

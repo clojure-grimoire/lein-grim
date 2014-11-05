@@ -10,7 +10,7 @@
 
 (defn grim
   "Usage: lein grim src <dst>
-      : lein grim artifact <groupid> <artifactid> <version> <dst>
+     : lein grim artifact <groupid> <artifactid> <version> <dst>
 
 In source mode, lein-grim traverses the source paths of the current project,
 enumerating and documenting all namespaces. This is intended for documenting

@@ -10,16 +10,45 @@ folder structures using
 
 [![Clojars Project](http://clojars.org/org.clojure-grimoire/lein-grim/latest-version.svg)](http://clojars.org/org.clojure-grimoire/lein-grim)
 
-1. Add the latest version to your lein `:plugins`
-2. `cd` into the root of a target project
-3. `$ lein grim $NS_REGEX $DOC_DST_DIR`
+First, add lein-grim to your leiningen plugins.
 
-lein-grim will enumerate all the namespaces on your classpath, load
-them and generate documentation records for all public vars and
-namespaces writing it out into the specified destination dir using
-`lib-grimoire` for all file I/O. This output directory can either be
-used to run a local instance of Grimoire, or version controlled and
-submitted to Grimoire for web hosting.
+lein-grim has two usage modes - source and artifact.
+
+### Source
+
+Source usage traverses the leingen source paths of a lein project,
+loading namespaces defined in your source files and generating
+Grimoire documentation written into the target directory you
+specify. Here the directory `doc` is used as the target, however it is
+reccomended that you provide to package Grimoire documentation blobs
+independently from your source code so that individuals interested in
+hosting Grimoire instances can use it as a submodule or other
+resource.
+
+```
+$ cd my-project
+$ lein grim src doc/
+```
+
+### Artifact
+
+Some interesting objects such as the Clojure core don't have nice
+leiningen projects which can be introspected. In this case, lein-grim
+can introspect a jar as added to the classpath by leiningen from
+`.m2`, locate all namespaces in the targeted jar and generate documentation.
+
+```
+$ lein new victim
+$ cd victim
+$ lein grim artifact org.clojure clojure 1.6.0 doc/
+```
+
+Here I generated an empty project as a vehicle for getting an instance
+of Clojure 1.6.0 on the lein classpath and then invoked lein-grim to
+write Grimoire documentation for all of clojure.core into the folder
+`doc`. Note that in the special case of clojure.core, lein-grim will
+ignore `clojure.parallel` due to its dependency on non-standard jars
+which kill documentation generation.
 
 ## License
 

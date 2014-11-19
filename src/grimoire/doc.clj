@@ -106,7 +106,8 @@
                  (assoc  :src  (var->src var)
                          :type (var->type var))
                  (update :name name-stringifier)
-                 (update :ns   ns-stringifier))]
+                 (update :ns   ns-stringifier)
+                 (dissoc :inline))]
     (api/write-meta config
                     (var->thing config var)
                     docs)))

@@ -175,9 +175,9 @@
   [p-groupid p-artifactid p-version p-source-paths ;; provided by lein
    mode-selector & args ;; user provided
    ]
-  (let [config  {:groupid    groupid
-                 :artifactid artifactid
-                 :version    version
+  (let [config  {:groupid    p-groupid
+                 :artifactid p-artifactid
+                 :version    p-version
                  :datastore  {:docs (last args)}}]
     (case mode-selector
       ("artifact" :artifact)

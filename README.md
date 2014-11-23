@@ -12,6 +12,16 @@ folder structures using
 
 First, add lein-grim to your leiningen plugins.
 
+Second, create the lein-grim alias:
+
+```
+{:user {:aliases {"grim"     ["run" "-m" "grimoire.doc"
+                              ,,:project/groupid
+                              ,,:project/artifactid
+                              ,,:project/version
+                              ,,#(->> % :source-paths (clojure.string/join " "))]}
+```
+
 lein-grim has two usage modes - source and artifact.
 
 ### Source

@@ -206,7 +206,6 @@
                      :artifactid p-artifactid
                      :version    p-version
                      :datastore  {:docs (last args)}}]
-        (println p-source-paths)
         (doseq [ns (->> p-source-paths
                         (map io/file)
                         (tns.f/find-namespaces))]

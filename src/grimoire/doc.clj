@@ -106,7 +106,8 @@
                  (assoc  :src  (var->src var)
                          :type (var->type var))
                  (update :name name-stringifier)
-                 (update :ns   ns-stringifier))]
+                 (update :ns   ns-stringifier)
+                 (dissoc :inline))]
     (api/write-meta config
                     (var->thing config var)
                     docs)))
@@ -156,17 +157,39 @@
   (println "Finished" ns)
   nil)
 
-(defn -main
+(declare -main)
 
-  [groupid artifactid version target files-thing]
-  (let [config  {:groupid    groupid
-                 :artifactid artifactid
-                 :version    version
-                 :datastore  {:docs target}}]
-    (if (= :classpath files-thing)
-      ;; classpath searching case
-      (let [pattern (format ".*?/%s/%s/%s.*"
-                            (string/replace groupid "." "/") artifactid version)
+(defn -main
+  "Usage: lein grim src <dst>
+  : lein grim artifact <groupid> <artifactid> <version> <dst>
+
+  In source mode, lein-grim traverses the source paths of the current project,
+  enumerating and documenting all namespaces. This is intended for documenting
+  projects for which you have both source and a lein project.
+
+  In artifact mode, lein-grim traverses an artifact on the classpath enumerating
+  and documenting the namespaces therein. This is intended for documenting
+  projects such as clojure.core which may not exist as a covenient lein project
+  but which do exist as artifacts."
+  
+  [p-groupid p-artifactid p-version p-source-paths ;; provided by lein
+   mode-selector & args ;; user provided
+   ]
+  (case mode-selector
+    ("artifact" :artifact)
+    ,,(let [[groupid artifactid version dst] args
+            _ (assert groupid "Groupid missing!")
+            _ (assert artifactid "Artifactid missing!")
+            _ (assert version "Version missing!")
+            _ (assert dst "Doc target dir missing!")
+            config {:groupid    groupid
+                    :artifactid artifactid
+                    :version    version
+                    :datastore  {:docs dst}}
+            pattern (format ".*?/%s/%s/%s.*"
+                            (string/replace groupid "." "/")
+                            artifactid
+                            version)
             pattern (re-pattern pattern)]
         (doseq [e (cp/classpath)]
           (when (re-matches pattern (str e))
@@ -175,9 +198,18 @@
                 (require ns)
                 (write-docs-for-ns config ns))))))
 
-      ;; source dirs vector case
-      (doseq [ns (->> files-thing
-                      (map io/file)
-                      (tns.f/find-namespaces))]
-        (require ns)
-        (write-docs-for-ns config ns)))))
+    ("src" :src "source" :source)
+    ,,(let [[doc] args
+            _ (assert doc "Doc target dir missing!")
+            
+            config  {:groupid    p-groupid
+                     :artifactid p-artifactid
+                     :version    p-version
+                     :datastore  {:docs (last args)}}]
+        (doseq [ns (->> p-source-paths
+                        (map io/file)
+                        (tns.f/find-namespaces))]
+          (require ns)
+          (write-docs-for-ns config ns))
+
+        (:doc (meta #'-main)))))

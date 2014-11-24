@@ -203,11 +203,11 @@
             _ (assert doc "Doc target dir missing!")
             
             config  {:groupid    p-groupid
-                               :artifactid p-artifactid
-                               :version    p-version
-                               :datastore  {:docs (last args)}}]
+                     :artifactid p-artifactid
+                     :version    p-version
+                     :datastore  {:docs (last args)}}]
+        (println p-source-paths)
         (doseq [ns (->> p-source-paths
-                        (string/split #" ")
                         (map io/file)
                         (tns.f/find-namespaces))]
           (require ns)

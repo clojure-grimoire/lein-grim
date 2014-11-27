@@ -6,6 +6,8 @@
             [clojure.tools.namespace.find :as tns.f]
             [clojure.java.classpath :as cp]
             [grimoire.api :as api]
+            [grimoire.api.fs]
+            [grimoire.api.fs.write]
             [grimoire.things :as t]
             [grimoire.util :as util]
             [detritus.var :refer [var->ns var->sym macro?]]
@@ -185,7 +187,8 @@
             config {:groupid    groupid
                     :artifactid artifactid
                     :version    version
-                    :datastore  {:docs dst}}
+                    :datastore  {:docs dst
+                                 :mode :filesystem}}
             pattern (format ".*?/%s/%s/%s.*"
                             (string/replace groupid "." "/")
                             artifactid
@@ -205,7 +208,8 @@
             config  {:groupid    p-groupid
                      :artifactid p-artifactid
                      :version    p-version
-                     :datastore  {:docs (last args)}}]
+                     :datastore  {:docs (last args)
+                                  :mode :filesystem}}]
         (doseq [ns (->> p-source-paths
                         (map io/file)
                         (tns.f/find-namespaces))]

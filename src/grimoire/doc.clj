@@ -109,7 +109,8 @@
                          :type (var->type var))
                  (update :name name-stringifier)
                  (update :ns   ns-stringifier)
-                 (dissoc :inline))]
+                 (dissoc :inline
+                         :protocol))]
     (api/write-meta config
                     (var->thing config var)
                     docs)))

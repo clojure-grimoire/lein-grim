@@ -267,6 +267,7 @@
                         (map io/file)
                         (tns.f/find-namespaces))]
           (require ns)
-          (write-docs-for-ns config ns))
+          (write-docs-for-ns config ns)))
 
-        (:doc (meta #'-main)))))
+    ;; Implicit else
+    (:doc (meta #'-main))))

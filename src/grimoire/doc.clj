@@ -270,4 +270,4 @@
           (write-docs-for-ns config ns)))
 
     ;; Implicit else
-    (:doc (meta #'-main))))
+    (println (:doc (meta #'-main)))))

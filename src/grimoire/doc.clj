@@ -54,16 +54,18 @@
       (t/->Def      (name (var->sym var)))))
 
 (defn ns->thing
-
-  [{:keys [groupid artifactid version]} ns-symbol]
+  "Function from a"
+  [{:keys [groupid artifactid version platform :as cfg]} ns-symbol]
   {:pre [(symbol? ns-symbol)
          (string? groupid)
          (string? artifactid)
-         (string? version)]}
-  (t/->Ns groupid
-          artifactid
-          version
-          (name ns-symbol)))
+         (string? version)
+         (string? platform)]}
+  (-> (t/->Group    groupid)
+      (t/->Artifact artifactid)
+      (t/->Version  version)
+      (t/->Platform platform)
+      (t/->Ns       (name ns-symbol))))
 
 (defn var->src
   "Adapted from clojure.repl/source-fn. Returns a string of the source code for

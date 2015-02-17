@@ -55,7 +55,7 @@
 
 (defn ns->thing
   "Function from a"
-  [{:keys [groupid artifactid version platform :as cfg]} ns-symbol]
+  [{:keys [groupid artifactid version platform]} ns-symbol]
   {:pre [(symbol? ns-symbol)
          (string? groupid)
          (string? artifactid)

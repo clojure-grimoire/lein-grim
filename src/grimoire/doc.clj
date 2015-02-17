@@ -215,7 +215,7 @@
   and documenting the namespaces therein. This is intended for documenting
   projects such as clojure.core which may not exist as a covenient lein project
   but which do exist as artifacts."
-  [p-groupid p-artifactid p-version p-source-paths ;; provided by lein
+  [p-groupid p-artifactid p-version p-source-paths ;; provided by lein via profile
    mode-selector & args ;; user provided
    ]
   (case mode-selector

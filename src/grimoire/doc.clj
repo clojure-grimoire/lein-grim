@@ -150,7 +150,7 @@
   [{:keys [groupid artifactid version] :as config}]
   (doseq [[sym {:keys [forms doc] :as fake-meta}] @#'clojure.repl/special-doc-map]
     (api/write-meta config
-                    (t/->Def groupid artifactid version "clojure.core" (name sym))
+                    (t/->Def groupid artifactid version "clj" "clojure.core" (name sym))
                     {:ns       "clojure.core"
                      :name     sym
                      :doc      doc

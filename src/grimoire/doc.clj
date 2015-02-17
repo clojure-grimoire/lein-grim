@@ -204,8 +204,8 @@
 (declare -main)
 
 (defn -main
-  "Usage: lein grim src <dst>
-  : lein grim artifact <groupid> <artifactid> <version> <dst>
+  "Usage: lein grim src <platform> <dst>
+  : lein grim artifact <platform> <groupid> <artifactid> <version> <dst>
 
   In source mode, lein-grim traverses the source paths of the current project,
   enumerating and documenting all namespaces. This is intended for documenting
@@ -220,21 +220,29 @@
    ]
   (case mode-selector
     ("artifact" :artifact)
-    ,,(let [[groupid artifactid version dst] args
-            _ (assert groupid "Groupid missing!")
-            _ (assert artifactid "Artifactid missing!")
-            _ (assert version "Version missing!")
-            _ (assert dst "Doc target dir missing!")
-            config {:groupid    groupid
-                    :artifactid artifactid
-                    :version    version
-                    :datastore  {:docs dst
-                                 :mode :filesystem}}
-            pattern (format ".*?/%s/%s/%s.*"
-                            (string/replace groupid "." "/")
-                            artifactid
-                            version)
-            pattern (re-pattern pattern)]
+    ,,(let [[platform
+             groupid
+             artifactid
+             version
+             dst]    args
+             _        (assert platform "Platform missing!")
+             platform (util/normalize-platform platform)
+             _        (assert platform "Unknown platform!")
+             _        (assert groupid "Groupid missing!")
+             _        (assert artifactid "Artifactid missing!")
+             _        (assert version "Version missing!")
+             _        (assert dst "Doc target dir missing!")
+             config   {:groupid    groupid
+                       :artifactid artifactid
+                       :version    version
+                       :platform   platform
+                       :datastore  {:docs dst
+                                    :mode :filesystem}}
+             pattern  (format ".*?/%s/%s/%s.*"
+                              (string/replace groupid "." "/")
+                              artifactid
+                              version)
+             pattern  (re-pattern pattern)]
         (doseq [e (cp/classpath)]
           (when (re-matches pattern (str e))
             (doseq [ns (tns.f/find-namespaces [e])]
@@ -243,14 +251,18 @@
                 (write-docs-for-ns config ns))))))
 
     ("src" :src "source" :source)
-    ,,(let [[doc] args
-            _ (assert doc "Doc target dir missing!")
-
-            config  {:groupid    p-groupid
-                     :artifactid p-artifactid
-                     :version    p-version
-                     :datastore  {:docs (last args)
-                                  :mode :filesystem}}]
+    ,,(let [[platform
+             doc]    args
+             _        (assert platform "Platform missing!")
+             platform (util/normalize-platform platform)
+             _        (assert platform "Unknown platform!")
+             _        (assert doc "Doc target dir missing!")
+             config   {:groupid    p-groupid
+                       :artifactid p-artifactid
+                       :version    p-version
+                       :platform   platform
+                       :datastore  {:docs (last args)
+                                    :mode :filesystem}}]
         (doseq [ns (->> p-source-paths
                         (map io/file)
                         (tns.f/find-namespaces))]

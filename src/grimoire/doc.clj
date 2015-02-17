@@ -72,7 +72,6 @@
   the given var, if it can find it. Returns nil if it can't find the source.
 
   Example: (var->src #'clojure.core/filter)"
-
   [v]
   {:pre [(var? v)]}
   (when-let [filepath (:file (meta v))]

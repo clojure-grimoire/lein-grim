@@ -38,17 +38,20 @@
           ,,:var)))
 
 (defn var->thing
-
-  [{:keys [groupid artifactid version]} var]
+  "Function from a groupid, artifactid, version, platform and a var to the Def
+  Thing representing the given var in the described Artifact."
+  [{:keys [groupid artifactid version platform]} var]
   {:pre [(string? groupid)
          (string? artifactid)
          (string? version)
+         (string? platform)
          (var? var)]}
-  (t/->Def groupid
-           artifactid
-           version
-           (name (var->ns var))
-           (name (var->sym var))))
+  (-> (t/->Group    groupid)
+      (t/->Artifact artifactid)
+      (t/->Version  version)
+      (t/->Platform platform)
+      (t/->Ns       (name (var->ns var)))
+      (t/->Def      (name (var->sym var)))))
 
 (defn ns->thing
 

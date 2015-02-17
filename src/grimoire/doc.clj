@@ -118,8 +118,10 @@
   [x]
   (cond (symbol? x)
         ,,(name x)
+
         (string? x)
         ,,x
+
         :else
         ,,(throw
            (Exception.

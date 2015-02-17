@@ -99,10 +99,13 @@
   [x]
   (cond (instance? clojure.lang.Namespace x)
         ,,(name (ns-name x))
+        
         (string? x)
         ,,x
+
         (symbol? x)
         ,,(name x)
+
         :else
         ,,(throw
            (Exception.

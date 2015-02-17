@@ -112,7 +112,9 @@
             (str "Don't know how to stringify " x)))))
 
 (defn name-stringifier
-
+  "Function from something (either a symbol, string or something else) which if
+  possible computes the logical \"name\" of the input as via clojure.core/name
+  otherwise throws an explicit exception."
   [x]
   (cond (symbol? x)
         ,,(name x)

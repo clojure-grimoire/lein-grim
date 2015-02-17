@@ -245,7 +245,7 @@
     ("src" :src "source" :source)
     ,,(let [[doc] args
             _ (assert doc "Doc target dir missing!")
-            
+
             config  {:groupid    p-groupid
                      :artifactid p-artifactid
                      :version    p-version

@@ -204,8 +204,8 @@
 (declare -main)
 
 (defn -main
-  "Usage: lein grim src <platform> <dst>
-  : lein grim artifact <platform> <groupid> <artifactid> <version> <dst>
+  "Usage: lein grim [src|:src|source|:source] <platform> <dst>
+  : lein grim [artifact|:artifact] <platform> <groupid> <artifactid> <version> <dst>
 
   In source mode, lein-grim traverses the source paths of the current project,
   enumerating and documenting all namespaces. This is intended for documenting

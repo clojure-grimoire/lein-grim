@@ -144,7 +144,9 @@
                     docs)))
 
 (defn write-docs-for-specials
-
+  "FIXME: this function needs to be purged and support for \"special forms\"
+  needs to be added as an argument with some sort of datastructure file rather
+  than doing it via the baked in clojure.repl/special-doc-map."
   [{:keys [groupid artifactid version] :as config}]
   (doseq [[sym {:keys [forms doc] :as fake-meta}] @#'clojure.repl/special-doc-map]
     (api/write-meta config

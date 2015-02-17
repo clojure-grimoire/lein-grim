@@ -128,7 +128,9 @@
             (str "Don't know how to stringify " x)))))
 
 (defn write-docs-for-var
-
+  "General case of writing documentation for a Var instance with
+  metadata. Compute a \"docs\" structure from the var's metadata and then punt
+  off to write-meta which does the heavy lifting."
   [config var]
   (let [docs (-> (meta var)
                  (assoc  :src  (var->src var)

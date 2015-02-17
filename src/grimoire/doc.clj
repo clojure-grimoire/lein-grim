@@ -6,12 +6,10 @@
             [clojure.tools.namespace.find :as tns.f]
             [clojure.java.classpath :as cp]
             [grimoire.api :as api]
-            [grimoire.api.fs]
             [grimoire.api.fs.write]
             [grimoire.things :as t]
             [grimoire.util :as util]
-            [detritus.var :refer [var->ns var->sym macro?]]
-            [detritus.update :refer [update]]))
+            [detritus.var :refer [var->ns var->sym macro?]]))
 
 (defn var->type
 

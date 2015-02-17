@@ -93,7 +93,9 @@
             (str text)))))))
 
 (defn ns-stringifier
-
+  "Function something (either a Namespace instance, a string or a symbol) to a
+  string naming the input. Intended for use in computing the logical \"name\" of
+  the :ns key which could have any of these values."
   [x]
   (cond (instance? clojure.lang.Namespace x)
         ,,(name (ns-name x))

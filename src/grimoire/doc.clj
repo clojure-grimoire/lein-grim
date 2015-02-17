@@ -12,15 +12,30 @@
             [detritus.var :refer [var->ns var->sym macro?]]))
 
 (defn var->type
+  "Function from a var to the type of the var.
 
+  - Vars tagged as dynamic or satisfying the .isDynamic predicate are tagged
+    as :var values.
+  - Vars tagged as macros (as required by the macro contract) are tagged
+    as :macro values.
+  - Vars with fn? or MultiFn values are tagged as :fn values.
+  - All other vars are simply tagged as :var."
   [v]
   {:pre [(var? v)]}
   (let [m (meta v)]
-    (cond (:macro m)                            :macro
+    (cond (:macro m)
+          ,,:macro
+          
           (or (:dynamic m)
-              (.isDynamic ^clojure.lang.Var v)) :var
-              (fn? @v)                          :fn
-              :else                             :var)))
+              (.isDynamic ^clojure.lang.Var v))
+          ,,:var
+
+          (or (fn? @v)
+              (instance? clojure.lang.MultiFn @v))
+          ,,:fn
+
+          :else
+          ,,:var)))
 
 (defn var->thing
 

@@ -166,7 +166,15 @@
   #{#'clojure.data/Diff})
 
 (defn write-docs-for-ns
+  "Function of a configuration and a Namespace which traverses the public vars
+  of that namespace, writing documentation for each var as specified by the
+  config.
 
+  FIXME: currently provides special handling for the case of documenting
+  clojure.core, so that \"special forms\" in core will be documented via the
+  write-docs-for-specials function. This behavior will change and be replaced
+  with fully fledged support for writing documentation for arbitrary non-def
+  symbols via an input datastructure."
   [config ns]
   (let [ns-vars (->> (ns-publics ns) vals (remove var-blacklist))
         macros  (filter macro? ns-vars)

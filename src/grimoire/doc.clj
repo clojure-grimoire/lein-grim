@@ -207,14 +207,14 @@
   "Usage: lein grim [src|:src|source|:source] <platform> <dst>
      : lein grim [artifact|:artifact]      <platform> <groupid> <artifactid> <version> <dst>
 
-  In source mode, lein-grim traverses the source paths of the current project,
-  enumerating and documenting all namespaces. This is intended for documenting
-  projects for which you have both source and a lein project.
+In source mode, lein-grim traverses the source paths of the current project,
+enumerating and documenting all namespaces. This is intended for documenting
+projects for which you have both source and a lein project.
 
-  In artifact mode, lein-grim traverses an artifact on the classpath enumerating
-  and documenting the namespaces therein. This is intended for documenting
-  projects such as clojure.core which may not exist as a covenient lein project
-  but which do exist as artifacts."
+In artifact mode, lein-grim traverses an artifact on the classpath enumerating
+and documenting the namespaces therein. This is intended for documenting
+projects such as clojure.core which may not exist as a covenient lein project
+but which do exist as artifacts."
   [p-groupid p-artifactid p-version p-source-paths ;; provided by lein via profile
    mode-selector & args ;; user provided
    ]

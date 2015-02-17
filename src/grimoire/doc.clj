@@ -199,6 +199,8 @@
   (println "Finished" ns)
   nil)
 
+;; HACK: declare main so that the var literal can be used to get
+;; documentation metadata for printing usage.
 (declare -main)
 
 (defn -main

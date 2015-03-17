@@ -7,7 +7,9 @@
             [clojure.tools.namespace.find :as tns.f]
             [clojure.java.classpath :as cp]
             [grimoire.api :as api]
+            [grimoire.api.fs :refer [->Config]]
             [grimoire.api.fs.write]
+            [grimoire.api.fs.read]
             [grimoire.things :as t]
             [grimoire.util :as util]
             [grimoire.either :as e]
@@ -135,11 +137,12 @@
   there already _is_ metadata there without overwriting it."
   [config thing meta]
   (if (and (not (:clobber config))
-           (e/succeed? (api/read-meta config thing)))
+           (e/succeed? (api/read-meta (:datastore config) thing)))
     (println
      (format "Warning: metadata for thing %s already exists! continuing w/o clobbering..."
              (t/thing->path thing)))
-    (api/write-meta config thing meta)))
+    (do (println (t/thing->path thing))
+        (api/write-meta (:datastore config) thing meta))))
 
 (defn write-docs-for-var
   "General case of writing documentation for a Var instance with
@@ -153,15 +156,15 @@
                  (update :ns   ns-stringifier)
                  (dissoc :inline
                          :protocol))]
-    (guarde-write-meta config
-                       (var->thing config var)
-                       docs)))
+    (guarded-write-meta config
+                        (var->thing config var)
+                        docs)))
 
 (defn write-docs-for-specials
   "Function of a config and what is presumed to be a legitimate .edn file
   containing a map from platform naming strings to maps from namespace qualified
   symbols to metadata for these symbols."
-  [{:keys [groupid artifactid version platform] :as config} specials-file]
+  [{:keys [groupid artifactid version platform] :as config} ?special-file]
   (assert (.exists ?special-file) "No such special symbols file!")
   (let [specials-data (edn/read-string (slurp ?special-file))
         ?specials     (get specials-data platform)]
@@ -196,9 +199,9 @@
                         ns-vars)
         vars    (filter #(not (fn? @%1)) ns-vars)]
 
-    (let [meta  (-> ns the-ns meta)
+    (let [meta  (-> ns the-ns meta (or {}))
           thing (ns->thing config ns)]
-      (api/write-meta config thing meta))
+      (api/write-meta (:datastore config) thing meta))
 
     ;; write per symbol docs
     (doseq [var ns-vars]
@@ -298,8 +301,7 @@
                          :artifactid artifactid
                          :version    version
                          :platform   platform
-                         :datastore  {:docs dst
-                                      :mode :filesystem}
+                         :datastore  (->Config dst "" "")
                          :clobber    clobber}
                pattern  (format ".*?/%s/%s/%s.*"
                                 (string/replace groupid "." "/")
@@ -327,8 +329,7 @@
                         :artifactid p-artifactid
                         :version    p-version
                         :platform   platform
-                        :datastore  {:docs (last args)
-                                     :mode :filesystem}
+                        :datastore  (->Config (last args) "" "")
                         :clobber    clobber}]
           (doseq [ns (->> p-source-paths
                           (map io/file)

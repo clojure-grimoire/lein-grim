@@ -29,7 +29,7 @@
   (let [m (meta v)]
     (cond (:macro m)
           ,,:macro
-          
+
           (or (:dynamic m)
               (.isDynamic ^clojure.lang.Var v))
           ,,:var
@@ -103,7 +103,7 @@
   [x]
   (cond (instance? clojure.lang.Namespace x)
         ,,(name (ns-name x))
-        
+
         (string? x)
         ,,x
 
@@ -259,7 +259,7 @@
   <dst>
     A string naming the file path of a directory where the generated
   documentation will be stored.
-  
+
   Options
   --------------------------------------------------------------------------------
   --specials <file>
@@ -308,7 +308,18 @@
                                 artifactid
                                 version)
                pattern  (re-pattern pattern)]
-          
+
+          ;; write placeholder meta
+          ;;----------------------------------------
+          (reduce (fn [acc f]
+                    (api/write-meta (:datastore config) acc nil)
+                    (f acc))
+                  (t/->Group groupid)
+                  [#(t/->Artifact % artifactid)
+                   #(t/->Version % version)
+                   #(t/->Platform % platform)
+                   identity])
+
           (doseq [e (cp/classpath)]
             (when (re-matches pattern (str e))
               (doseq [ns (tns.f/find-namespaces [e])]
@@ -331,6 +342,18 @@
                         :platform   platform
                         :datastore  (->Config (last args) "" "")
                         :clobber    clobber}]
+
+          ;; write placeholder meta
+          ;;----------------------------------------
+          (reduce (fn [acc f]
+                    (api/write-meta (:datastore config) acc nil)
+                    (f acc))
+                  (t/->Group groupid)
+                  [#(t/->Artifact % artifactid)
+                   #(t/->Version % version)
+                   #(t/->Platform % platform)
+                   identity])
+          
           (doseq [ns (->> p-source-paths
                           (map io/file)
                           (tns.f/find-namespaces))]

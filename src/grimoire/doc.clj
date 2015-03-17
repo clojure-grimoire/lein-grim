@@ -197,23 +197,26 @@
         fns     (filter #(and (fn? @%1)
                               (not (macro? %1)))
                         ns-vars)
-        vars    (filter #(not (fn? @%1)) ns-vars)]
+        vars    (filter #(not (fn? @%1)) ns-vars)
+        ns-meta (-> ns the-ns meta (or {}))]
 
-    (let [meta  (-> ns the-ns meta (or {}))
-          thing (ns->thing config ns)]
-      (api/write-meta (:datastore config) thing meta))
+    (when-not (:skip-wiki ns-meta)
+      ;; Respect ^:skip-wiki from clojure-grimoire/lein-grim#4
 
-    ;; write per symbol docs
-    (doseq [var ns-vars]
-      (write-docs-for-var config var))
+      (let [thing (ns->thing config ns)]
+        (api/write-meta (:datastore config) thing ns-meta))
 
-    ;; FIXME: this shouldn't be needed
-    (when (= ns 'clojure.core)
-      (write-docs-for-specials config)))
+      ;; write per symbol docs
+      (doseq [var ns-vars]
+        (write-docs-for-var config var))
 
-  ;; FIXME: should be a real logging thing
-  (println "Finished" ns)
-  nil)
+      ;; FIXME: this shouldn't be needed
+      (when (= ns 'clojure.core)
+        (write-docs-for-specials config)))
+
+    ;; FIXME: should be a real logging thing
+    (println "Finished" ns)
+    nil))
 
 (defn maybe-take-pair [leader args]
   (if (= (first args) leader)
@@ -353,7 +356,7 @@
                    #(t/->Version % version)
                    #(t/->Platform % platform)
                    identity])
-          
+
           (doseq [ns (->> p-source-paths
                           (map io/file)
                           (tns.f/find-namespaces))]

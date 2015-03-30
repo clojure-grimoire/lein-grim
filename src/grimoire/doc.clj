@@ -351,9 +351,9 @@
           (reduce (fn [acc f]
                     (api/write-meta (:datastore config) acc {})
                     (f acc))
-                  (t/->Group groupid)
-                  [#(t/->Artifact % artifactid)
-                   #(t/->Version % version)
+                  (t/->Group p-groupid)
+                  [#(t/->Artifact % p-artifactid)
+                   #(t/->Version % p-version)
                    #(t/->Platform % platform)
                    identity])
 

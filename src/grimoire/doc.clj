@@ -315,7 +315,7 @@
           ;; write placeholder meta
           ;;----------------------------------------
           (reduce (fn [acc f]
-                    (api/write-meta (:datastore config) acc nil)
+                    (api/write-meta (:datastore config) acc {})
                     (f acc))
                   (t/->Group groupid)
                   [#(t/->Artifact % artifactid)
@@ -349,7 +349,7 @@
           ;; write placeholder meta
           ;;----------------------------------------
           (reduce (fn [acc f]
-                    (api/write-meta (:datastore config) acc nil)
+                    (api/write-meta (:datastore config) acc {})
                     (f acc))
                   (t/->Group groupid)
                   [#(t/->Artifact % artifactid)

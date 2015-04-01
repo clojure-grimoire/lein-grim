@@ -208,11 +208,7 @@
 
       ;; write per symbol docs
       (doseq [var ns-vars]
-        (write-docs-for-var config var))
-
-      ;; FIXME: this shouldn't be needed
-      (when (= ns 'clojure.core)
-        (write-docs-for-specials config)))
+        (write-docs-for-var config var)))
 
     ;; FIXME: should be a real logging thing
     (println "Finished" ns)

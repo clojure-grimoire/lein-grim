@@ -155,7 +155,9 @@
                  (update :name name-stringifier)
                  (update :ns   ns-stringifier)
                  (dissoc :inline
-                         :protocol))]
+                         :protocol
+                         :inline
+                         :inline-arities))]
     (guarded-write-meta config
                         (var->thing config var)
                         docs)))
@@ -208,11 +210,7 @@
 
       ;; write per symbol docs
       (doseq [var ns-vars]
-        (write-docs-for-var config var))
-
-      ;; FIXME: this shouldn't be needed
-      (when (= ns 'clojure.core)
-        (write-docs-for-specials config)))
+        (write-docs-for-var config var)))
 
     ;; FIXME: should be a real logging thing
     (println "Finished" ns)
@@ -228,8 +226,8 @@
 (declare -main)
 
 (defn -main
-  "Usage: lein grim [src|:src|source|:source] [opts] <platform> <dst>
-     : lein grim [artifact|:artifact]      [opts] <platform> <groupid> <artifactid> <version> <dst>
+  "Usage: lein grim [opts] [src|:src|source|:source] <platform> <dst>
+     : lein grim [opts] [artifact|:artifact] <platform> <groupid> <artifactid> <version> <dst>
 
   In source mode, lein-grim traverses the source paths of the current project,
   enumerating and documenting all namespaces. This is intended for documenting
@@ -282,11 +280,12 @@
   [p-groupid p-artifactid p-version p-source-paths ;; provided by lein via profile
    & args ;; user provided
    ]
-  (let [[mode-selector ?platform & args] args
-        [?special-file args]             (maybe-take-pair "--specials" args)
+  (let [[?special-file args]             (maybe-take-pair "--specials" args)
         ?special-file                    (when ?special-file (io/file ?special-file))
         [?clobber args]                  (maybe-take-pair "--clobber" args)
-        clobber                          (if (= "true" ?clobber) true false)]
+        clobber                          (if (= "true" ?clobber) true false)
+        [mode-selector ?platform & args] args]
+    (println ?special-file clobber args)
     (case mode-selector
       ("artifact" :artifact)
       ,,(let [[groupid

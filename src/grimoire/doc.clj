@@ -155,7 +155,9 @@
                  (update :name name-stringifier)
                  (update :ns   ns-stringifier)
                  (dissoc :inline
-                         :protocol))]
+                         :protocol
+                         :inline
+                         :inline-arities))]
     (guarded-write-meta config
                         (var->thing config var)
                         docs)))

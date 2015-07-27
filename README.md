@@ -6,12 +6,11 @@ A Leiningen plugin for generating [Grimoire](https://github.com/clojure-grimoire
 
 [![Clojars Project](http://clojars.org/org.clojure-grimoire/lein-grim/latest-version.svg)](http://clojars.org/org.clojure-grimoire/lein-grim)
 
-First, add lein-grim to your leiningen plugins.
-
-Second, create the lein-grim alias:
+In `.lein/profiles.clj`, add lein-grim to your leiningen `:dependencies` and create the lein-grim alias:
 
 ```
 {:user
+   {:dependencies [org.clojure-grimoire/lein-grim <latest version>]}
    {:aliases
      {"grim" ["run" "-m" "grimoire.doc"
               ,,:project/groupid
@@ -52,7 +51,9 @@ $ lein grim artifact clj org.clojure clojure 1.6.0 doc/
 
 Here I generated an empty project as a vehicle for getting an instance of Clojure 1.6.0 on the lein classpath and then invoked lein-grim to write Grimoire documentation for all of clojure.core into the folder `doc`.
 
-Note that in the special case of clojure.core, lein-grim will ignore `clojure.parallel` due to its dependency on non-standard jars which kill documentation generation.
+**Note** In the special case of clojure.core, lein-grim will ignore `clojure.parallel` due to its dependency on non-standard jars which kill documentation generation.
+
+**Note** Normally you have to add the artifact you want to introspect to the `:dependencies` in `project.clj`. This step wasn't necessary in the example above, because `[org.clojure/clojure "1.6.0"]` is in there by default.
 
 ## License
 

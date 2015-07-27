@@ -277,7 +277,10 @@
   specials file should _overwrite_ generated documentation. If specified, this
   option may be proceeded only by specials. Other values than true or false will
   be interpreted as false."
-  [p-groupid p-artifactid p-version p-source-paths ;; provided by lein via profile
+  [p-groupid
+   p-artifactid   ;; note that lein calls this "name" and not "artifactid"
+   p-version
+   p-source-paths ;; all provided by lein via profile
    & args ;; user provided
    ]
   (let [[?special-file args]             (maybe-take-pair "--specials" args)

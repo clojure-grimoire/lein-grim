@@ -9,6 +9,6 @@
                  [org.clojure/tools.namespace "0.2.7"]]
   :aliases {"grim" ["run" "-m" "grimoire.doc"
                     ,,:project/groupid
-                    ,,:project/artifactid
+                    ,,:project/name
                     ,,:project/version
                     ,,nil]})

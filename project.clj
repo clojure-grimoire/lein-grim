@@ -9,7 +9,7 @@
                  [org.clojure/tools.namespace "0.2.7"]
                  [me.arrdem/detritus "0.2.2"]]
   :aliases {"grim" ["run" "-m" "grimoire.doc"
-                    ,,:project/groupid
+                    ,,:project/group
                     ,,:project/name
                     ,,:project/version
                     ,,nil]})

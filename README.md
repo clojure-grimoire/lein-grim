@@ -13,7 +13,7 @@ In `.lein/profiles.clj`, add lein-grim to your leiningen `:dependencies` and cre
    {:dependencies [org.clojure-grimoire/lein-grim <latest version>]}
    {:aliases
      {"grim" ["run" "-m" "grimoire.doc"
-              ,,:project/groupid
+              ,,:project/group
               ,,:project/name
               ,,:project/version
               ,,nil]}}}

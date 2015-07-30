@@ -168,7 +168,11 @@
   symbols to metadata for these symbols."
   [{:keys [groupid artifactid version platform] :as config} ?special-file]
   (assert (.exists ?special-file) "No such special symbols file!")
-  (let [specials-data (edn/read-string (slurp ?special-file))
+  (let [share         (-> (t/->Group groupid)
+                          (t/->Artifact artifactid)
+                          (t/->Version version)
+                          (t/->Platform platform))
+        specials-data (edn/read-string (slurp ?special-file))
         ?specials     (get specials-data platform)]
     (if-not ?specials
       (println "Warning: No special forms for the given platform!, continuing...")
@@ -176,8 +180,9 @@
         (if-not (namespace sym)
           (println (str "Error: namespace unqualified special symbol " sym ", continuing..."))
           (guarded-write-meta config
-                              (t/->Def groupid artifactid version
-                                       platform (namespace sym) (name sym))
+                              (-> share
+                                  (t/->Ns (namespace sym))
+                                  (t/->Def (name sym)))
                               meta))))))
 
 (def var-blacklist

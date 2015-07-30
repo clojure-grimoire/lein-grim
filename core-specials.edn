@@ -145,10 +145,10 @@ fields, and Java class static fields."}
   finally-clause => (finally expr*)
 
   Catches and handles Java exceptions."}
-        clojure.core/catch         {:type     :sentinel
-                                    :redirect "clojure.core/try"}
-        clojure.core/finally       {:type     :sentinel
-                                    :redirect "clojure.core/try"}
+        clojure.core/catch         {:type   :sentinel
+                                    :target "clojure.core/try"}
+        clojure.core/finally       {:type   :sentinel
+                                    :target "clojure.core/try"}
         clojure.core/var           {:type     :special
                                     :name     "var"
                                     :ns       "clojure.core"

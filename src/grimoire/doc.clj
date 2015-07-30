@@ -293,7 +293,6 @@
         [?clobber args]                  (maybe-take-pair "--clobber" args)
         clobber                          (if (= "true" ?clobber) true false)
         [mode-selector ?platform & args] args]
-    (println ?special-file clobber args)
     (case mode-selector
       ("artifact" :artifact)
       ,,(let [[groupid

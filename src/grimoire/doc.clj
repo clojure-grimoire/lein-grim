@@ -168,7 +168,11 @@
   symbols to metadata for these symbols."
   [{:keys [groupid artifactid version platform] :as config} ?special-file]
   (assert (.exists ?special-file) "No such special symbols file!")
-  (let [specials-data (edn/read-string (slurp ?special-file))
+  (let [share         (-> (t/->Group groupid)
+                          (t/->Artifact artifactid)
+                          (t/->Version version)
+                          (t/->Platform platform))
+        specials-data (edn/read-string (slurp ?special-file))
         ?specials     (get specials-data platform)]
     (if-not ?specials
       (println "Warning: No special forms for the given platform!, continuing...")
@@ -176,8 +180,9 @@
         (if-not (namespace sym)
           (println (str "Error: namespace unqualified special symbol " sym ", continuing..."))
           (guarded-write-meta config
-                              (t/->Def groupid artifactid version
-                                       platform (namespace sym) (name sym))
+                              (-> share
+                                  (t/->Ns (namespace sym))
+                                  (t/->Def (name sym)))
                               meta))))))
 
 (def var-blacklist
@@ -277,7 +282,10 @@
   specials file should _overwrite_ generated documentation. If specified, this
   option may be proceeded only by specials. Other values than true or false will
   be interpreted as false."
-  [p-groupid p-artifactid p-version p-source-paths ;; provided by lein via profile
+  [p-groupid
+   p-artifactid   ;; note that lein calls this "name" and not "artifactid"
+   p-version
+   p-source-paths ;; all provided by lein via profile
    & args ;; user provided
    ]
   (let [[?special-file args]             (maybe-take-pair "--specials" args)
@@ -285,7 +293,6 @@
         [?clobber args]                  (maybe-take-pair "--clobber" args)
         clobber                          (if (= "true" ?clobber) true false)
         [mode-selector ?platform & args] args]
-    (println ?special-file clobber args)
     (case mode-selector
       ("artifact" :artifact)
       ,,(let [[groupid

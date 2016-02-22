@@ -6,23 +6,72 @@ A Leiningen plugin for generating [Grimoire](https://github.com/clojure-grimoire
 
 [![Clojars Project](http://clojars.org/org.clojure-grimoire/lein-grim/latest-version.svg)](http://clojars.org/org.clojure-grimoire/lein-grim)
 
-First, add lein-grim to your leiningen plugins.
-
-Second, create the lein-grim alias:
+In `.lein/profiles.clj`, add lein-grim to your leiningen `:dependencies` and create the lein-grim alias:
 
 ```
 {:user
+   {:dependencies [org.clojure-grimoire/lein-grim <latest version>]}
    {:aliases
      {"grim" ["run" "-m" "grimoire.doc"
-              ,,:project/groupid
-              ,,:project/artifactid
+              ,,:project/group
+              ,,:project/name
               ,,:project/version
               ,,nil]}}}
 ```
 
 **FOR FULL DOCS** simply run `lein grim help`.
 
-lein-grim has two usage modes - source and artifact.
+> Usage: lein grim [opts] [src|:src|source|:source] <platform> <dst>
+>      : lein grim [opts] [artifact|:artifact] <platform> <groupid> <artifactid> <version> <dst>
+> 
+>   In source mode, lein-grim traverses the source paths of the current project,
+>   enumerating and documenting all namespaces. This is intended for documenting
+>   projects for which you have both source and a lein project.
+> 
+>   In artifact mode, lein-grim traverses an artifact on the classpath enumerating
+>   and documenting the namespaces therein. This is intended for documenting
+>   projects such as clojure.core which may not exist as a covenient lein project
+>   but which do exist as artifacts.
+> 
+>   Both modes accept the following options which must be specified in order or
+>   omitted.
+> 
+>   Arguments
+>   --------------------------------------------------------------------------------
+>   <platform>
+>     One of clj cljs or cljclr. Indicates what Clojure platform is being
+>   documented. Only one may be selected at a time. At present, only clj is
+>   supported.
+> 
+>   <groupid>
+>     A string naming the Maven group of the artifact being documented.
+> 
+>   <artifactid>
+>     A string naming the Maven artifactId of the artifact being documented.
+> 
+>   <version>
+>     A string giving the Maven version of the artifact being documented.
+> 
+>   <dst>
+>     A string naming the file path of a directory where the generated
+>   documentation will be stored.
+> 
+>   Options
+>   --------------------------------------------------------------------------------
+>   --specials <file>
+>     Specifies an EDN map from platform strings to namespaced symbols to
+>   metadata. Symbols listed in this file will be added to the generated
+>   documentation with the specified metadata. If specified, specials must be the
+>   1st option given.
+> 
+>   --clobber [true | false]
+>     Enables or disables overwriting metadata which already exists. When
+>   disabled, attempting to write metadata to a symbol in an artifact which has
+>   already been documented will generate a warning. Should be enabled only if
+>   re-generating documentation in place without cleaning the target dir or if the
+>   specials file should _overwrite_ generated documentation. If specified, this
+>   option may be proceeded only by specials. Other values than true or false will
+>   be interpreted as false.
 
 ### Source
 
@@ -52,7 +101,9 @@ $ lein grim artifact clj org.clojure clojure 1.6.0 doc/
 
 Here I generated an empty project as a vehicle for getting an instance of Clojure 1.6.0 on the lein classpath and then invoked lein-grim to write Grimoire documentation for all of clojure.core into the folder `doc`.
 
-Note that in the special case of clojure.core, lein-grim will ignore `clojure.parallel` due to its dependency on non-standard jars which kill documentation generation.
+**Note** In the special case of clojure.core, lein-grim will ignore `clojure.parallel` due to its dependency on non-standard jars which kill documentation generation.
+
+**Note** Normally you have to add the artifact you want to introspect to the `:dependencies` in `project.clj`. This step wasn't necessary in the example above, because `[org.clojure/clojure "1.6.0"]` is in there by default.
 
 ## License
 

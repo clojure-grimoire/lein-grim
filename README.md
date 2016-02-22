@@ -21,7 +21,57 @@ In `.lein/profiles.clj`, add lein-grim to your leiningen `:dependencies` and cre
 
 **FOR FULL DOCS** simply run `lein grim help`.
 
-lein-grim has two usage modes - source and artifact.
+> Usage: lein grim [opts] [src|:src|source|:source] <platform> <dst>
+>      : lein grim [opts] [artifact|:artifact] <platform> <groupid> <artifactid> <version> <dst>
+> 
+>   In source mode, lein-grim traverses the source paths of the current project,
+>   enumerating and documenting all namespaces. This is intended for documenting
+>   projects for which you have both source and a lein project.
+> 
+>   In artifact mode, lein-grim traverses an artifact on the classpath enumerating
+>   and documenting the namespaces therein. This is intended for documenting
+>   projects such as clojure.core which may not exist as a covenient lein project
+>   but which do exist as artifacts.
+> 
+>   Both modes accept the following options which must be specified in order or
+>   omitted.
+> 
+>   Arguments
+>   --------------------------------------------------------------------------------
+>   <platform>
+>     One of clj cljs or cljclr. Indicates what Clojure platform is being
+>   documented. Only one may be selected at a time. At present, only clj is
+>   supported.
+> 
+>   <groupid>
+>     A string naming the Maven group of the artifact being documented.
+> 
+>   <artifactid>
+>     A string naming the Maven artifactId of the artifact being documented.
+> 
+>   <version>
+>     A string giving the Maven version of the artifact being documented.
+> 
+>   <dst>
+>     A string naming the file path of a directory where the generated
+>   documentation will be stored.
+> 
+>   Options
+>   --------------------------------------------------------------------------------
+>   --specials <file>
+>     Specifies an EDN map from platform strings to namespaced symbols to
+>   metadata. Symbols listed in this file will be added to the generated
+>   documentation with the specified metadata. If specified, specials must be the
+>   1st option given.
+> 
+>   --clobber [true | false]
+>     Enables or disables overwriting metadata which already exists. When
+>   disabled, attempting to write metadata to a symbol in an artifact which has
+>   already been documented will generate a warning. Should be enabled only if
+>   re-generating documentation in place without cleaning the target dir or if the
+>   specials file should _overwrite_ generated documentation. If specified, this
+>   option may be proceeded only by specials. Other values than true or false will
+>   be interpreted as false.
 
 ### Source
 

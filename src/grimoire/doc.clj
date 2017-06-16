@@ -152,12 +152,14 @@
   (let [docs (-> (meta var)
                  (assoc  :src  (var->src var)
                          :type (var->type var))
-                 (update :name name-stringifier)
-                 (update :ns   ns-stringifier)
+                 (update :name #(name-stringifier (or %1 (t/thing->name var))))
+                 (update :ns   #(ns-stringifier (or %1 (t/thing->name (t/thing->namespace var)))))
                  (dissoc :inline
                          :protocol
                          :inline
                          :inline-arities))]
+    (assert (:name docs) "Var name was nil!")
+    (assert (:namespace docs) "Var namespace was nil!")
     (guarded-write-meta config
                         (var->thing config var)
                         docs)))

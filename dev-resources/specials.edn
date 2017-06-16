@@ -1,0 +1,163 @@
+{"clj"
+ {clojure.core/.             {:type     :special
+                              :name     "."
+                              :ns       "clojure.core"
+                              :url      "java_interop#dot"
+                              :arglists [(.instanceMember instance args*)
+                                         (.instanceMember Classname args*)
+                                         (Classname/staticMethod args*)
+                                         Classname/staticField]
+                              :added    "1.0"
+                              :src      ";; Special forms have no source"
+                              :column   nil
+                              :line     nil
+                              :file     nil
+                              :doc      "The instance member form works for both fields and methods.
+  They all expand into calls to the dot operator at macroexpansion time."}
+  clojure.core/def           {:type     :special
+                              :name     "def"
+                              :ns       "clojure.core"
+                              :arglists [(def symbol doc-string? init?)]
+                              :added    "1.0"
+                              :src      ";; Special forms have no source"
+                              :column   nil
+                              :line     nil
+                              :file     nil
+                              :doc      "Creates and interns a global var with the name
+  of symbol in the current namespace (*ns*) or locates such a var if
+  it already exists.  If init is supplied, it is evaluated, and the
+  root binding of the var is set to the resulting value.  If init is
+  not supplied, the root binding of the var is unaffected."}
+  clojure.core/do            {:type     :special
+                              :name     "do"
+                              :ns       "clojure.core"
+                              :arglists [(do exprs*)]
+                              :added    "1.0"
+                              :src      ";; Special forms have no source"
+                              :column   nil
+                              :line     nil
+                              :file     nil
+                              :doc      "Evaluates the expressions in order and returns the value of
+  the last. If no expressions are supplied, returns nil."}
+  clojure.core/if            {:type     :special
+                              :name     "if"
+                              :ns       "clojure.core"
+                              :arglists [(if test then else?)]
+                              :added    "1.0"
+                              :src      ";; Special forms have no source"
+                              :column   nil
+                              :line     nil
+                              :file     nil
+                              :doc      "Evaluates test. If not the singular values nil or false,
+  evaluates and yields then, otherwise, evaluates and yields else. If
+  else is not supplied it defaults to nil."}
+  clojure.core/monitor-enter {:type     :special
+                              :name     "monitor-enter"
+                              :ns       "clojure.core"
+                              :arglists [(monitor-enter x)]
+                              :added    "1.0"
+                              :src      ";; Special forms have no source"
+                              :column   nil
+                              :line     nil
+                              :file     nil
+                              :doc      "Synchronization primitive that should be avoided
+  in user code. Use the 'locking' macro."}
+  clojure.core/monitor-exit  {:type     :special
+                              :name     "monitor-exit"
+                              :ns       "clojure.core"
+                              :arglists [(monitor-exit x)]
+                              :added    "1.0"
+                              :src      ";; Special forms have no source"
+                              :column   nil
+                              :line     nil
+                              :file     nil
+                              :doc      "Synchronization primitive that should be avoided
+  in user code. Use the 'locking' macro."}
+  clojure.core/new           {:type     :special
+                              :name     "new"
+                              :ns       "clojure.core"
+                              :arglists [(Classname. args*) (new Classname args*)]
+                              :added    "1.0"
+                              :src      ";; Special forms have no source"
+                              :column   nil
+                              :line     nil
+                              :file     nil
+                              :url      "java_interop#new"
+                              :doc      "The args, if any, are evaluated from left to right, and
+  passed to the constructor of the class named by Classname. The
+  constructed object is returned."}
+  clojure.core/quote         {:type     :special
+                              :name     "quote"
+                              :ns       "clojure.core"
+                              :arglists [(quote form)]
+                              :added    "1.0"
+                              :src      ";; Special forms have no source"
+                              :column   nil
+                              :line     nil
+                              :file     nil
+                              :doc      "Yields the unevaluated form."}
+  clojure.core/recur         {:type     :special
+                              :name     "recur"
+                              :ns       "clojure.core"
+                              :arglists [(recur exprs*)]
+                              :added    "1.0"
+                              :src      ";; Special forms have no source"
+                              :column   nil
+                              :line     nil
+                              :file     nil
+                              :doc      "Evaluates the exprs in order, then, in parallel, rebinds
+  the bindings of the recursion point to the values of the exprs.
+  Execution then jumps back to the recursion point, a loop or fn method."}
+  clojure.core/set!          {:type     :special
+                              :name     "set!"
+                              :ns       "clojure.core"
+                              :arglists [(set! var-symbol expr)
+                                         (set! (. instance-expr instanceFieldName-symbol) expr)
+                                         (set! (. Classname-symbol staticFieldName-symbol) expr)]
+                              :added    "1.0"
+                              :src      ";; Special forms have no source"
+                              :column   nil
+                              :line     nil
+                              :file     nil
+                              :url      "vars#set"
+                              :doc      "Used to set thread-local-bound vars, Java object instance
+fields, and Java class static fields."}
+  clojure.core/throw         {:type     :special
+                              :name     "throw"
+                              :ns       "clojure.core"
+                              :arglists [(throw expr)]
+                              :added    "1.0"
+                              :src      ";; Special forms have no source"
+                              :column   nil
+                              :line     nil
+                              :file     nil
+                              :doc      "The expr is evaluated and thrown, therefore it should
+  yield an instance of some derivee of Throwable."}
+  clojure.core/try           {:type     :special
+                              :name     "try"
+                              :ns       "clojure.core"
+                              :arglists [(try expr* catch-clause* finally-clause?)]
+                              :added    "1.0"
+                              :src      ";; Special forms have no source"
+                              :column   nil
+                              :line     nil
+                              :file     nil
+                              :doc      "catch-clause => (catch classname name expr*)
+  finally-clause => (finally expr*)
+
+  Catches and handles Java exceptions."}
+  clojure.core/catch   {:type   :sentinel
+                        :target "clojure.core/try"}
+  clojure.core/finally {:type   :sentinel
+                        :target "clojure.core/try"}
+  clojure.core/var     {:type     :special
+                        :name     "var"
+                        :ns       "clojure.core"
+                        :arglists [(var symbol)]
+                        :added    "1.0"
+                        :src      ";; Special forms have no source"
+                        :column   nil
+                        :line     nil
+                        :file     nil
+                        :doc      "The symbol must resolve to a var, and the Var object
+itself (not its value) is returned. The reader macro #'x expands to (var x)."}}}

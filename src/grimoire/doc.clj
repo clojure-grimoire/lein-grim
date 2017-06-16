@@ -296,29 +296,29 @@
         clobber                          (if (= "true" ?clobber) true false)
         [mode-selector ?platform & args] args]
     (case mode-selector
-      ("artifact" :artifact)
+      ("artifact" ":artifact")
       ,,(let [[groupid
                artifactid
                version
-               dst]     args
-               _        (assert ?platform "Platform missing!")
-               platform (util/normalize-platform ?platform)
-               _        (assert platform "Unknown platform!")
-               _        (assert groupid "Groupid missing!")
-               _        (assert artifactid "Artifactid missing!")
-               _        (assert version "Version missing!")
-               _        (assert dst "Doc target dir missing!")
-               config   {:groupid    groupid
-                         :artifactid artifactid
-                         :version    version
-                         :platform   platform
-                         :datastore  (->Config dst "" "")
-                         :clobber    clobber}
-               pattern  (format ".*?/%s/%s/%s.*"
-                                (string/replace groupid "." "/")
-                                artifactid
-                                version)
-               pattern  (re-pattern pattern)]
+               dst]    args
+              _        (assert ?platform "Platform missing!")
+              platform (util/normalize-platform ?platform)
+              _        (assert platform "Unknown platform!")
+              _        (assert groupid "Groupid missing!")
+              _        (assert artifactid "Artifactid missing!")
+              _        (assert version "Version missing!")
+              _        (assert dst "Doc target dir missing!")
+              config   {:groupid    groupid
+                        :artifactid artifactid
+                        :version    version
+                        :platform   platform
+                        :datastore  (->Config dst "" "")
+                        :clobber    clobber}
+              pattern  (format ".*?/%s/%s/%s.*"
+                               (string/replace groupid "." "/")
+                               artifactid
+                               version)
+              pattern  (re-pattern pattern)]
 
           ;; write placeholder meta
           ;;----------------------------------------
@@ -341,7 +341,7 @@
           (when ?special-file
             (write-docs-for-specials config ?special-file)))
 
-      ("src" :src "source" :source)
+      ("src" ":src" "source" ":source")
       ,,(let [[doc]    args
               _        (assert ?platform "Platform missing!")
               platform (util/normalize-platform ?platform)

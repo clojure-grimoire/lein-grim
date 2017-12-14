@@ -13,7 +13,12 @@
             [grimoire.things :as t]
             [grimoire.util :as util]
             [grimoire.either :as e]
-            [detritus.var :refer [var->ns var->sym macro?]]))
+            [detritus.var :refer [var->ns var->sym macro?]])
+  (:import [clojure.lang
+            ,,Var
+            ,,Namespace
+            ,,MultiFn
+            ,,RT]))
 
 (defn var->type
   "Function from a var to the type of the var.
@@ -31,11 +36,11 @@
           ,,:macro
 
           (or (:dynamic m)
-              (.isDynamic ^clojure.lang.Var v))
+              (.isDynamic ^Var v))
           ,,:var
 
           (or (fn? @v)
-              (instance? clojure.lang.MultiFn @v))
+              (instance? MultiFn @v))
           ,,:fn
 
           :else
@@ -79,7 +84,7 @@
   [v]
   {:pre [(var? v)]}
   (when-let [filepath (:file (meta v))]
-    (when-let [strm (.getResourceAsStream (clojure.lang.RT/baseLoader) filepath)]
+    (when-let [strm (.getResourceAsStream (RT/baseLoader) filepath)]
       (with-open [rdr (java.io.LineNumberReader. (java.io.InputStreamReader. strm))]
         (binding [*ns* (.ns v)]
           (dotimes [_ (dec (:line (meta v)))]
@@ -96,35 +101,44 @@
               (read (java.io.PushbackReader. pbr)))
             (str text)))))))
 
-(defn ns-stringifier
-  "Function something (either a Namespace instance, a string or a symbol) to a
-  string naming the input. Intended for use in computing the logical \"name\" of
-  the :ns key which could have any of these values."
+(defn name-stringifier
+  "Function from something (either a symbol, string or something else) which if
+  possible computes the logical \"name\" of the input as via clojure.core/name
+  otherwise throws an explicit exception."
   [x]
-  (cond (instance? clojure.lang.Namespace x)
+  (cond (instance? Namespace x)
         ,,(name (ns-name x))
 
-        (string? x)
-        ,,x
+        (instance? Var x)
+        ,,(.name x)
 
         (symbol? x)
         ,,(name x)
+
+        (string? x)
+        ,,x
 
         :else
         ,,(throw
            (Exception.
             (str "Don't know how to stringify " x)))))
 
-(defn name-stringifier
-  "Function from something (either a symbol, string or something else) which if
-  possible computes the logical \"name\" of the input as via clojure.core/name
-  otherwise throws an explicit exception."
+(defn ns-stringifier
+  "Function something (either a Namespace instance, a string or a symbol) to a
+  string naming the input. Intended for use in computing the logical \"name\" of
+  the :ns key which could have any of these values."
   [x]
-  (cond (symbol? x)
+  (cond (string? x)
+        ,,x
+
+        (symbol? x)
         ,,(name x)
 
-        (string? x)
-        ,,x
+        (instance? Var x)
+        ,,(name-stringifier (.ns x))
+
+        (instance? Namespace x)
+        ,,(name-stringifier x)
 
         :else
         ,,(throw
@@ -152,14 +166,14 @@
   (let [docs (-> (meta var)
                  (assoc  :src  (var->src var)
                          :type (var->type var))
-                 (update :name #(name-stringifier (or %1 (t/thing->name var))))
-                 (update :ns   #(ns-stringifier (or %1 (t/thing->name (t/thing->namespace var)))))
+                 (update :name #(name-stringifier (or %1 var)))
+                 (update :namespace #(ns-stringifier (or %1 var)))
                  (dissoc :inline
                          :protocol
                          :inline
                          :inline-arities))]
-    (assert (:name docs) "Var name was nil!")
-    (assert (:namespace docs) "Var namespace was nil!")
+    (assert (:name docs) (str "Var name was nil! " docs))
+    (assert (:namespace docs) (str "Var namespace was nil! " docs))
     (guarded-write-meta config
                         (var->thing config var)
                         docs)))
